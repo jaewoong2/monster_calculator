@@ -14,13 +14,14 @@
 ## 3. 기능 요구사항
 - **기본 계산:** 숫자 입력, 사칙연산, 소수점, AC(초기화), 삭제.
 - **오류 처리:** '0으로 나누기' 등 수식 오류 발생 시 에러 핸들링.
-- **캐릭터 반응 상태 (Mascot State):**
-  - `idle` (대기): 눈을 깜빡이거나 가볍게 숨쉬는 애니메이션
-  - `input` (입력 중): 사용자가 숫자를 누를 때 살짝 끄덕임
-  - `thinking` (연산자 입력): 연산자가 입력되면 생각하는 표정
-  - `success` (= 버튼 클릭): 결과가 나오면 박수 치거나 기뻐함
-  - `error` (오류 발생): 0으로 나누기 등 오류 시 당황하거나 땀 흘림
+- **캐릭터 반응 상태 (Mascot State) 및 에셋 매핑 (B안 적용):**
+  - 정적 PNG 에셋 위에 React Native(뷰 오버레이)와 Reanimated 트랜지션을 조합하여 생동감을 구현한다.
+  - `idle` (대기): `assets/images/welcome_bluu.png` 사용. (Reanimated로 가볍게 둥둥 떠있는 위아래 효과)
+  - `input` (입력 중): `assets/images/welcome_bluu.png` 유지. (눈을 RN 뷰 단에서 오버레이로 그려 깜빡이게 하거나 살짝 Bounce 애니메이션 추가)
+  - `thinking` (연산자 입력): `assets/images/timer_bluu.png` 사용.
+  - `success` (= 버튼 클릭): `assets/images/wink_bluu.png` 사용. (Reanimated로 통통 튀는 점프 애니메이션 추가)
+  - `error` (오류 발생): `assets/images/welcome_bluu.png` 유지. (좌우로 빠르게 Shake 하는 애니메이션 적용 및 UI 땀방울/당황 마크 추가)
 
 ## 4. UX/UI 원칙
-- 애니메이션은 0.3초 내외로 매우 짧고 부드럽게(비동기) 실행.
 - 캐릭터가 결과 숫자나 버튼을 절대 가려서는 안 됨.
+- 애니메이션은 0.3초 내외로 매우 짧고 부드럽게(비동기) 실행되어, 사용자의 숫자 입력(Blocking)을 방해하면 안 됨.
