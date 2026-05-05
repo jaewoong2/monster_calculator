@@ -1,6 +1,0 @@
-day,date,episode,segment_label,status,output_file,notes
-1,2026-05-02,2,EP2 Part 1 (0:00~10:00),completed,output/day01_ep2_part1.md,자동 생성 완료
-2,2026-05-03,2,EP2 Part 2 (10:00~20:00),failed,,youtube-transcript MCP 도구가 트랜스크립트 내용 미반환 (status ok만 반환)
-2,2026-05-03,2,EP2 Part 2 (10:00~20:00),completed,output/day02_ep2_part2.md,Python fallback generated
-3,2026-05-04,2,EP2 Part 3 (20:00~30:00),completed,output/day03_ep2_part3.md,Python fallback generated
-4,2026-05-05,2,EP2 Part 4 (30:00~40:00),completed,output/day04_ep2_part4.md,Python fallback generated
