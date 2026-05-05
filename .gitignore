@@ -30,6 +30,10 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# local agent/tooling artifacts
+.omx/
+.serena/
+
 # local env files
 .env*.local
 
