@@ -25,7 +25,6 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
-.serena/
 
 # macOS
 .DS_Store
@@ -42,7 +41,3 @@ app-example
 # generated native folders
 /ios
 /android
-
-# english study automation runtime artifacts
-docs/english-automation/output/
-docs/english-automation/study_progress.csv
