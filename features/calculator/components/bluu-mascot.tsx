@@ -1,3 +1,4 @@
+import { Asset } from 'expo-asset';
 import { Image } from 'expo-image';
 import { useEffect } from 'react';
 import { View } from 'react-native';
@@ -16,12 +17,22 @@ type BluuMascotProps = {
   mood: CalculatorMascotMood;
 };
 
+const timerBluuImage = {
+  uri: Asset.fromModule(require('../../../assets/images/timer_bluu.png')).uri,
+};
+const welcomeBluuImage = {
+  uri: Asset.fromModule(require('../../../assets/images/welcome_bluu.png')).uri,
+};
+const winkBluuImage = {
+  uri: Asset.fromModule(require('../../../assets/images/wink_bluu.png')).uri,
+};
+
 const MASCOT_SOURCE_BY_MOOD = {
-  idle: require('@/assets/images/welcome_bluu.png'),
-  input: require('@/assets/images/welcome_bluu.png'),
-  thinking: require('@/assets/images/timer_bluu.png'),
-  success: require('@/assets/images/wink_bluu.png'),
-  error: require('@/assets/images/welcome_bluu.png'),
+  idle: welcomeBluuImage,
+  input: welcomeBluuImage,
+  thinking: timerBluuImage,
+  success: winkBluuImage,
+  error: welcomeBluuImage,
 } as const;
 
 export function BluuMascot({ mood }: BluuMascotProps) {
