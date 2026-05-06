@@ -4,10 +4,9 @@
     "jsxImportSource": "nativewind",
     "strict": true,
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+      "@/*": ["./*"]
+    },
+    "module": "esnext"
   },
   "include": [
     "**/*.ts",
