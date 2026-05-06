@@ -24,7 +24,9 @@ type CalculatorKeyAction =
   | "operator"
   | "equals"
   | "clear"
-  | "delete";
+  | "delete"
+  | "percent"
+  | "toggleSign";
 
 type CalculatorKeyConfig = {
   label: string;
@@ -33,10 +35,10 @@ type CalculatorKeyConfig = {
   wide?: boolean;
 };
 
-const KEY_ROWS: CalculatorKeyConfig[][] = [
+const TOP_KEY_ROWS: CalculatorKeyConfig[][] = [
   [
     { label: "AC", action: "clear", tone: "utility" },
-    { label: "⌫", action: "delete", tone: "utility" },
+    { label: "%", action: "percent", tone: "utility" },
     { label: "÷", action: "operator", tone: "operator" },
     { label: "×", action: "operator", tone: "operator" },
   ],
@@ -52,14 +54,17 @@ const KEY_ROWS: CalculatorKeyConfig[][] = [
     { label: "6", action: "digit" },
     { label: "+", action: "operator", tone: "operator" },
   ],
+];
+
+const BOTTOM_LEFT_KEY_ROWS: CalculatorKeyConfig[][] = [
   [
     { label: "1", action: "digit" },
     { label: "2", action: "digit" },
     { label: "3", action: "digit" },
-    { label: "=", action: "equals", tone: "equals" },
   ],
   [
-    { label: "0", action: "digit", wide: true },
+    { label: "+/-", action: "toggleSign", tone: "utility" },
+    { label: "0", action: "digit" },
     { label: ".", action: "decimal" },
   ],
 ];
@@ -85,6 +90,8 @@ export function CalculatorScreen() {
     mascotMood,
     inputDigit,
     inputDecimal,
+    inputPercent,
+    toggleSign,
     chooseOperator,
     evaluate,
     clear,
@@ -97,6 +104,8 @@ export function CalculatorScreen() {
       mascotMood: state.mascotMood,
       inputDigit: state.inputDigit,
       inputDecimal: state.inputDecimal,
+      inputPercent: state.inputPercent,
+      toggleSign: state.toggleSign,
       chooseOperator: state.chooseOperator,
       evaluate: state.evaluate,
       clear: state.clear,
@@ -109,6 +118,45 @@ export function CalculatorScreen() {
       clearEntries: state.clearEntries,
     })),
   );
+
+  const handleKeyPress = (key: CalculatorKeyConfig) => {
+    if (key.action === "digit") {
+      inputDigit(key.label);
+      return;
+    }
+
+    if (key.action === "decimal") {
+      inputDecimal();
+      return;
+    }
+
+    if (key.action === "operator") {
+      chooseOperator(key.label as CalculatorOperator);
+      return;
+    }
+
+    if (key.action === "equals") {
+      evaluate();
+      return;
+    }
+
+    if (key.action === "delete") {
+      deleteLast();
+      return;
+    }
+
+    if (key.action === "percent") {
+      inputPercent();
+      return;
+    }
+
+    if (key.action === "toggleSign") {
+      toggleSign();
+      return;
+    }
+
+    clear();
+  };
 
   return (
     <DottedBackground>
@@ -129,50 +177,41 @@ export function CalculatorScreen() {
           />
 
           <View className="flex-1 gap-3">
-            {KEY_ROWS.map((row, rowIndex) => (
+            {TOP_KEY_ROWS.map((row, rowIndex) => (
               <View key={rowIndex} className="flex-1 flex-row gap-3">
-                {row.map((key) => {
-                  const onPress = () => {
-                    if (key.action === "digit") {
-                      inputDigit(key.label);
-                      return;
-                    }
-
-                    if (key.action === "decimal") {
-                      inputDecimal();
-                      return;
-                    }
-
-                    if (key.action === "operator") {
-                      chooseOperator(key.label as CalculatorOperator);
-                      return;
-                    }
-
-                    if (key.action === "equals") {
-                      evaluate();
-                      return;
-                    }
-
-                    if (key.action === "delete") {
-                      deleteLast();
-                      return;
-                    }
-
-                    clear();
-                  };
-
-                  return (
-                    <CalculatorKey
-                      key={key.label}
-                      label={key.label}
-                      tone={key.tone}
-                      wide={key.wide}
-                      onPress={onPress}
-                    />
-                  );
-                })}
+                {row.map((key) => (
+                  <CalculatorKey
+                    key={key.label}
+                    label={key.label}
+                    tone={key.tone}
+                    wide={key.wide}
+                    onPress={() => handleKeyPress(key)}
+                  />
+                ))}
               </View>
             ))}
+            <View className="flex-[2] flex-row gap-3">
+              <View className="flex-[3] gap-3">
+                {BOTTOM_LEFT_KEY_ROWS.map((row, rowIndex) => (
+                  <View key={rowIndex} className="flex-1 flex-row gap-3">
+                    {row.map((key) => (
+                      <CalculatorKey
+                        key={key.label}
+                        label={key.label}
+                        tone={key.tone}
+                        wide={key.wide}
+                        onPress={() => handleKeyPress(key)}
+                      />
+                    ))}
+                  </View>
+                ))}
+              </View>
+              <CalculatorKey
+                label="="
+                tone="equals"
+                onPress={() => handleKeyPress({ label: "=", action: "equals" })}
+              />
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>

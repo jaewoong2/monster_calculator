@@ -17,6 +17,8 @@ type CalculatorState = {
   mascotMood: CalculatorMascotMood;
   inputDigit: (digit: string) => void;
   inputDecimal: () => void;
+  inputPercent: () => void;
+  toggleSign: () => void;
   chooseOperator: (operator: CalculatorOperator) => void;
   evaluate: () => void;
   clear: () => void;
@@ -52,6 +54,11 @@ function formatResult(value: number) {
 
 function parseDisplayValue(value: string) {
   return Number(value);
+}
+
+function parseFiniteDisplayValue(value: string) {
+  const parsed = parseDisplayValue(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function appendOperatorToExpression(
@@ -168,6 +175,72 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
       currentValue,
       expression: updateCurrentOperandExpression(state.expression, currentValue, false),
       mascotMood: 'input',
+    });
+  },
+
+  inputPercent: () => {
+    const state = get();
+    const currentValue = formatResult(parseFiniteDisplayValue(state.currentValue) / 100);
+
+    if (state.errorMessage || state.justEvaluated) {
+      set({
+        currentValue,
+        previousValue: null,
+        operator: null,
+        expression: currentValue,
+        errorMessage: null,
+        isWaitingForOperand: false,
+        justEvaluated: false,
+        mascotMood: 'input',
+      });
+      return;
+    }
+
+    set({
+      currentValue,
+      expression: updateCurrentOperandExpression(
+        state.expression,
+        currentValue,
+        state.isWaitingForOperand,
+      ),
+      errorMessage: null,
+      isWaitingForOperand: false,
+      justEvaluated: false,
+      mascotMood: 'input',
+    });
+  },
+
+  toggleSign: () => {
+    const state = get();
+    const currentNumber = parseFiniteDisplayValue(state.currentValue);
+    const currentValue =
+      currentNumber === 0 ? INITIAL_DISPLAY : formatResult(currentNumber * -1);
+
+    if (state.errorMessage || state.justEvaluated) {
+      set({
+        currentValue,
+        previousValue: null,
+        operator: null,
+        expression: currentValue,
+        errorMessage: null,
+        isWaitingForOperand: false,
+        justEvaluated: false,
+        mascotMood: currentValue === INITIAL_DISPLAY ? 'idle' : 'input',
+      });
+      return;
+    }
+
+    set({
+      currentValue,
+      expression: updateCurrentOperandExpression(
+        state.expression,
+        currentValue,
+        state.isWaitingForOperand,
+      ),
+      errorMessage: null,
+      isWaitingForOperand: false,
+      justEvaluated: false,
+      mascotMood: currentValue === INITIAL_DISPLAY ? 'idle' : 'input',
     });
   },
 

@@ -46,11 +46,15 @@ export function CalculatorKey({
         {label}
       </Text>
       {label === "5" && (
-        <View className="top-0 -right-[65%] absolute">
+        <View
+          pointerEvents="none"
+          className="absolute -left-1/2 top-1/2"
+          style={{ transform: [{ translateX: "0%" }, { translateY: -50 }] }}
+        >
           <Image
             source={smallBluuImage}
             contentFit="contain"
-            style={{ width: 100, height: 100 }}
+            style={{ width: 90, height: 90 }}
           />
         </View>
       )}
