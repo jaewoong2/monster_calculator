@@ -152,7 +152,7 @@ export function QuickCalcCard({
   const result = buildResult(type, values);
 
   return (
-    <View className="overflow-hidden rounded-[28px] border border-white/70 bg-card shadow-lg">
+    <View className="overflow-hidden rounded-[28px] border border-white/70 bg-card">
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`${title} 열기`}
