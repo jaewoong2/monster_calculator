@@ -54,12 +54,38 @@ function parseDisplayValue(value: string) {
   return Number(value);
 }
 
-function buildExpression(previousValue: number | null, operator: CalculatorOperator | null, current: string) {
-  if (previousValue === null || operator === null) {
+function appendOperatorToExpression(
+  expression: string,
+  operator: CalculatorOperator,
+  currentValue: string,
+) {
+  const baseExpression = expression.trim() || INITIAL_DISPLAY;
+
+  if (baseExpression.endsWith('=')) {
+    return `${currentValue} ${operator}`;
+  }
+
+  if (/[+\-×÷]$/.test(baseExpression)) {
+    return `${baseExpression.slice(0, -1).trim()} ${operator}`;
+  }
+
+  return `${baseExpression} ${operator}`;
+}
+
+function updateCurrentOperandExpression(
+  expression: string,
+  current: string,
+  isWaitingForOperand: boolean,
+) {
+  if (!expression || expression.endsWith('=')) {
     return current;
   }
 
-  return `${formatResult(previousValue)} ${operator} ${current}`;
+  if (isWaitingForOperand || /[+\-×÷]$/.test(expression.trim())) {
+    return `${expression.trim()} ${current}`;
+  }
+
+  return expression.replace(/(-?\d+(?:\.\d*)?)$/, current);
 }
 
 export const useCalculatorStore = create<CalculatorState>((set, get) => ({
@@ -96,7 +122,11 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
 
     set({
       currentValue,
-      expression: buildExpression(state.previousValue, state.operator, currentValue),
+      expression: updateCurrentOperandExpression(
+        state.expression,
+        currentValue,
+        state.isWaitingForOperand,
+      ),
       isWaitingForOperand: false,
       mascotMood: 'input',
     });
@@ -122,7 +152,7 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
     if (state.isWaitingForOperand) {
       set({
         currentValue: '0.',
-        expression: buildExpression(state.previousValue, state.operator, '0.'),
+        expression: updateCurrentOperandExpression(state.expression, '0.', true),
         isWaitingForOperand: false,
         mascotMood: 'input',
       });
@@ -136,7 +166,7 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
     const currentValue = `${state.currentValue}.`;
     set({
       currentValue,
-      expression: buildExpression(state.previousValue, state.operator, currentValue),
+      expression: updateCurrentOperandExpression(state.expression, currentValue, false),
       mascotMood: 'input',
     });
   },
@@ -168,7 +198,7 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
           currentValue: '오류',
           previousValue: null,
           operator: null,
-          expression: `${formatResult(state.previousValue)} ${state.operator} ${state.currentValue}`,
+          expression: state.expression,
           errorMessage: '0으로 나눌 수 없습니다',
           isWaitingForOperand: true,
           justEvaluated: false,
@@ -182,7 +212,7 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
         currentValue,
         previousValue: result,
         operator: nextOperator,
-        expression: `${currentValue} ${nextOperator}`,
+        expression: appendOperatorToExpression(state.expression, nextOperator, currentValue),
         isWaitingForOperand: true,
         justEvaluated: false,
         mascotMood: 'thinking',
@@ -193,7 +223,7 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
     set({
       previousValue: inputValue,
       operator: nextOperator,
-      expression: `${formatResult(inputValue)} ${nextOperator}`,
+      expression: appendOperatorToExpression(state.expression, nextOperator, state.currentValue),
       isWaitingForOperand: true,
       justEvaluated: false,
       mascotMood: 'thinking',
@@ -215,7 +245,7 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
         currentValue: '오류',
         previousValue: null,
         operator: null,
-        expression: `${formatResult(state.previousValue)} ${state.operator} ${state.currentValue} =`,
+        expression: `${state.expression} =`,
         errorMessage: '0으로 나눌 수 없습니다',
         isWaitingForOperand: true,
         justEvaluated: false,
@@ -225,7 +255,7 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
     }
 
     const currentValue = formatResult(result);
-    const expression = `${formatResult(state.previousValue)} ${state.operator} ${state.currentValue} =`;
+    const expression = `${state.expression} =`;
 
     useCalculationHistoryStore.getState().addEntry({
       expression,
@@ -270,7 +300,7 @@ export const useCalculatorStore = create<CalculatorState>((set, get) => ({
 
     set({
       currentValue,
-      expression: buildExpression(state.previousValue, state.operator, currentValue),
+      expression: updateCurrentOperandExpression(state.expression, currentValue, false),
       mascotMood: currentValue === INITIAL_DISPLAY ? 'idle' : 'input',
     });
   },
