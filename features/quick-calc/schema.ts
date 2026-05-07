@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export type QuickCalcType = 'split-bill' | 'discount' | 'tip' | 'percent';
+export type QuickCalcType = 'split-bill' | 'discount' | 'tip' | 'percent' | 'unit-price' | 'interest';
 
 const numericText = (label: string) =>
   z
@@ -47,8 +47,27 @@ export const percentSchema = z.object({
   rate: numericText('비율'),
 });
 
+export const unitPriceSchema = z.object({
+  priceA: numericText('A 상품 가격'),
+  quantityA: numericText('A 상품 용량/개수'),
+  priceB: numericText('B 상품 가격'),
+  quantityB: numericText('B 상품 용량/개수'),
+});
+
+export const interestSchema = z.object({
+  principal: numericText('원금'),
+  rate: numericText('연 이자율'),
+  period: integerText('예치 기간'),
+});
+
 export type QuickCalcFormValues = {
   amount: string;
   count?: string;
   rate?: string;
+  priceA?: string;
+  quantityA?: string;
+  priceB?: string;
+  quantityB?: string;
+  principal?: string;
+  period?: string;
 };

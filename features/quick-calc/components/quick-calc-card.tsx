@@ -30,7 +30,7 @@ export function QuickCalcCard({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${title} 열기`}
-      className="flex-row items-center gap-4 rounded-[28px] border border-primary/50 bg-card px-5 py-4 active:scale-[0.99]"
+      className="flex-row items-center gap-4 rounded-[28px] border border-black/10 bg-card px-5 py-4 active:scale-[0.99]"
       onPress={onPress}
     >
       <View className="h-20 w-20 items-center justify-center rounded-full bg-secondary/15">

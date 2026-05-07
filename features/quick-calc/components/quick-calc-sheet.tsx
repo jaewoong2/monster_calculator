@@ -15,6 +15,8 @@ import {
   type QuickCalcType,
   splitBillSchema,
   tipSchema,
+  unitPriceSchema,
+  interestSchema,
 } from "../schema";
 import { type QuickCalcField } from "./quick-calc-card";
 
@@ -75,6 +77,27 @@ const COPY_BY_TYPE: Record<QuickCalcType, QuickCalcCopy> = {
       rate: "비율을 입력해주세요",
     },
   },
+  "unit-price": {
+    sheetTitle: "단가/가성비를 비교해볼게요",
+    sheetSubtitle: "두 상품의 가격과 용량을 입력해주세요",
+    ctaLabel: "비교하기",
+    fieldErrors: {
+      priceA: "A 가격을 입력해주세요",
+      quantityA: "A 용량을 입력해주세요",
+      priceB: "B 가격을 입력해주세요",
+      quantityB: "B 용량을 입력해주세요",
+    },
+  },
+  interest: {
+    sheetTitle: "간단 이자를 계산해볼게요",
+    sheetSubtitle: "원금과 이자율, 기간을 입력해주세요",
+    ctaLabel: "만기 금액 보기",
+    fieldErrors: {
+      principal: "원금을 입력해주세요",
+      rate: "이자율을 입력해주세요",
+      period: "기간을 입력해주세요",
+    },
+  },
 };
 
 const currencyFormatter = new Intl.NumberFormat("ko-KR", {
@@ -100,6 +123,14 @@ function parseQuickCalc(type: QuickCalcType, values: QuickCalcFormValues) {
 
   if (type === "tip") {
     return tipSchema.safeParse(values);
+  }
+
+  if (type === "unit-price") {
+    return unitPriceSchema.safeParse(values);
+  }
+
+  if (type === "interest") {
+    return interestSchema.safeParse(values);
   }
 
   return percentSchema.safeParse(values);
@@ -203,6 +234,55 @@ function buildResult(type: QuickCalcType, values: QuickCalcFormValues) {
     };
   }
 
+  if (type === "unit-price") {
+    const parsed = unitPriceSchema.safeParse(values);
+
+    if (!parsed.success) {
+      return null;
+    }
+
+    const { priceA, quantityA, priceB, quantityB } = parsed.data;
+    const unitPriceA = priceA / quantityA;
+    const unitPriceB = priceB / quantityB;
+
+    let headline = "";
+    let detail = "";
+
+    if (unitPriceA < unitPriceB) {
+      headline = "A 상품이 더 저렴해요!";
+      detail = `1단위 당 A는 ${numberFormatter.format(unitPriceA)}원, B는 ${numberFormatter.format(unitPriceB)}원`;
+    } else if (unitPriceA > unitPriceB) {
+      headline = "B 상품이 더 저렴해요!";
+      detail = `1단위 당 B는 ${numberFormatter.format(unitPriceB)}원, A는 ${numberFormatter.format(unitPriceA)}원`;
+    } else {
+      headline = "두 상품의 가성비가 같아요!";
+      detail = `1단위 당 ${numberFormatter.format(unitPriceA)}원으로 동일해요`;
+    }
+
+    return { headline, detail };
+  }
+
+  if (type === "interest") {
+    const parsed = interestSchema.safeParse(values);
+
+    if (!parsed.success) {
+      return null;
+    }
+
+    const { principal, rate, period } = parsed.data;
+    // 예금 단리 계산: 원금 * 이자율 * (기간/12)
+    const grossInterest = principal * (rate / 100) * (period / 12);
+    // 세금 (일반 과세 15.4%)
+    const tax = grossInterest * 0.154;
+    const netInterest = grossInterest - tax;
+    const finalAmount = principal + netInterest;
+
+    return {
+      headline: `${formatWon(finalAmount)}`,
+      detail: `세후 이자 ${formatWon(netInterest)} (세전 ${formatWon(grossInterest)})`,
+    };
+  }
+
   const parsed = percentSchema.safeParse(values);
 
   if (!parsed.success) {
@@ -241,6 +321,12 @@ export function QuickCalcSheet({
         amount: nextValues.amount ?? "",
         count: nextValues.count ?? "",
         rate: nextValues.rate ?? "",
+        priceA: nextValues.priceA ?? "",
+        quantityA: nextValues.quantityA ?? "",
+        priceB: nextValues.priceB ?? "",
+        quantityB: nextValues.quantityB ?? "",
+        principal: nextValues.principal ?? "",
+        period: nextValues.period ?? "",
       });
     });
 
