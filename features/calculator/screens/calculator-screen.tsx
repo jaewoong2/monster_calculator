@@ -56,19 +56,6 @@ const TOP_KEY_ROWS: CalculatorKeyConfig[][] = [
   ],
 ];
 
-const BOTTOM_LEFT_KEY_ROWS: CalculatorKeyConfig[][] = [
-  [
-    { label: "1", action: "digit" },
-    { label: "2", action: "digit" },
-    { label: "3", action: "digit" },
-  ],
-  [
-    { label: "+/-", action: "toggleSign", tone: "utility" },
-    { label: "0", action: "digit" },
-    { label: ".", action: "decimal" },
-  ],
-];
-
 export function CalculatorScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["55%", "90%"], []);
@@ -191,26 +178,25 @@ export function CalculatorScreen() {
               </View>
             ))}
             <View className="flex-[2] flex-row gap-3">
-              <View className="flex-[3] gap-3">
-                {BOTTOM_LEFT_KEY_ROWS.map((row, rowIndex) => (
-                  <View key={rowIndex} className="flex-1 flex-row gap-3">
-                    {row.map((key) => (
-                      <CalculatorKey
-                        key={key.label}
-                        label={key.label}
-                        tone={key.tone}
-                        wide={key.wide}
-                        onPress={() => handleKeyPress(key)}
-                      />
-                    ))}
-                  </View>
-                ))}
+              <View className="flex-1 gap-3">
+                <CalculatorKey label="1" onPress={() => handleKeyPress({ label: "1", action: "digit" })} />
+                <CalculatorKey label="+/-" tone="utility" onPress={() => handleKeyPress({ label: "+/-", action: "toggleSign" })} />
               </View>
-              <CalculatorKey
-                label="="
-                tone="equals"
-                onPress={() => handleKeyPress({ label: "=", action: "equals" })}
-              />
+              <View className="flex-1 gap-3">
+                <CalculatorKey label="2" onPress={() => handleKeyPress({ label: "2", action: "digit" })} />
+                <CalculatorKey label="0" onPress={() => handleKeyPress({ label: "0", action: "digit" })} />
+              </View>
+              <View className="flex-1 gap-3">
+                <CalculatorKey label="3" onPress={() => handleKeyPress({ label: "3", action: "digit" })} />
+                <CalculatorKey label="." onPress={() => handleKeyPress({ label: ".", action: "decimal" })} />
+              </View>
+              <View className="flex-1">
+                <CalculatorKey
+                  label="="
+                  tone="equals"
+                  onPress={() => handleKeyPress({ label: "=", action: "equals" })}
+                />
+              </View>
             </View>
           </View>
         </ScrollView>
